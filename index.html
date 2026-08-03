@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이리얼트립 8월 할인코드 모음</title>
+    <style>
+        :root {
+            --primary: #2b96ed;
+            --bg: #f4f6f8;
+            --card-bg: #ffffff;
+            --text: #333333;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 50px; }
+        
+        .header { background: var(--primary); color: white; text-align: center; padding: 30px 15px; }
+        .header h1 { font-size: 22px; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+        .section-title { font-size: 18px; font-weight: bold; margin: 25px 0 12px; color: #111; }
+
+        .card { background: var(--card-bg); border-radius: 12px; padding: 18px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; }
+        .card-info { flex: 1; padding-right: 10px; }
+        .card-info .tag { display: inline-block; background: #eef6ff; color: var(--primary); font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px; }
+        .card-info h3 { font-size: 15px; margin-bottom: 4px; color: #222; }
+        .card-info p { font-size: 12px; color: #777; }
+
+        .btn-copy { background: var(--primary); color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+        .btn-copy:active { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>마이리얼트립 할인코드 모음</h1>
+        <p>클릭 시 자동으로 쿠폰 코드가 복사됩니다.</p>
+    </div>
+
+    <div class="container">
+        <div class="section-title">🎫 8월 최신 할인쿠폰</div>
+
+        <div class="card">
+            <div class="card-info">
+                <span class="tag">해외 투어/티켓</span>
+                <h3>5,000원 할인쿠폰</h3>
+                <p>선착순 제공 / 최소 결제금액 조건 확인</p>
+            </div>
+            <button class="btn-copy" onclick="copyAndRedirect('260CMKTP5000', 'https://www.myrealtrip.com')">클릭시 자동복사</button>
+        </div>
+
+        <div class="card">
+            <div class="card-info">
+                <span class="tag">숙소/호텔</span>
+                <h3>전 세계 숙소 8% 할인</h3>
+                <p>제휴카드 결제 시 추가 할인 적용</p>
+            </div>
+            <button class="btn-copy" onclick="copyAndRedirect('MYREALHOTEL8', 'https://www.myrealtrip.com')">클릭시 자동복사</button>
+        </div>
+    </div>
+
+    <script>
+        function copyAndRedirect(code, url) {
+            navigator.clipboard.writeText(code).then(() => {
+                alert(`쿠폰코드 [ ${code} ] 가 복사되었습니다!\n이동하는 페이지에서 결제 시 붙여넣기 해주세요.`);
+                window.open(url, '_blank');
+            }).catch(() => {
+                window.open(url, '_blank');
+            });
+        }
+    </script>
+</body>
+</html>
