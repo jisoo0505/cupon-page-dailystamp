@@ -3,119 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>마이리얼트립 8월 할인코드 모음</title>
+    <title>마이리얼트립 할인코드 모음</title>
     <style>
-        :root {
-            --primary: #2b96ed;
-            --bg: #f4f6f8;
-            --card-bg: #ffffff;
-            --text: #333333;
-        }
+        :root { --primary: #2b96ed; --bg: #f4f6f8; --card-bg: #ffffff; --text: #333; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 50px; }
-        
         .header { background: var(--primary); color: white; text-align: center; padding: 30px 15px; }
-        .header h1 { font-size: 22px; margin-bottom: 8px; }
-        .header p { font-size: 14px; opacity: 0.9; }
-
         .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
-        .section-title { font-size: 18px; font-weight: bold; margin: 25px 0 12px; color: #111; }
-
-        .loading { text-align: center; padding: 30px; color: #777; font-size: 14px; }
-        
+        .section-title { font-size: 18px; font-weight: bold; margin: 25px 0 12px; }
         .card { background: var(--card-bg); border-radius: 12px; padding: 18px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; }
         .card-info { flex: 1; padding-right: 10px; }
         .card-info .tag { display: inline-block; background: #eef6ff; color: var(--primary); font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px; }
-        .card-info h3 { font-size: 15px; margin-bottom: 4px; color: #222; }
+        .card-info h3 { font-size: 15px; margin-bottom: 4px; }
         .card-info p { font-size: 12px; color: #777; }
-
-        .btn-copy { background: var(--primary); color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
-        .btn-copy:active { opacity: 0.8; }
+        .btn-copy { background: var(--primary); color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <div class="header">
         <h1>마이리얼트립 할인코드 모음</h1>
         <p>클릭 시 자동으로 쿠폰 코드가 복사됩니다.</p>
     </div>
-
     <div class="container">
-        <div class="section-title">🎫 최신 할인쿠폰 & 프로모션</div>
-        <div id="coupon-list">
-            <div class="loading">실시간 쿠폰 정보를 불러오는 중입니다...</div>
-        </div>
+        <div class="section-title">🎫 최신 할인쿠폰</div>
+        <div id="coupon-list">로딩 중...</div>
     </div>
 
     <script>
-        // 발급받으신 API KEY 설정
-        const API_KEY = "IX5X8ft0EJYgzki3CLojLub9i3U3yfpvWkUPS7fjff7C3W55lxjh2QEFnuk-K-Zk";
-
-        // 하드코딩된 기본 데이터 (API 통신 실패 시 비상용 Fallback 데이터)
-        const fallbackCoupons = [
-            { category: "해외 투어/티켓", title: "5,000원 할인쿠폰", code: "260CMKTP5000", desc: "최소 결제금액 조건 확인", link: "https://www.myrealtrip.com" },
-            { category: "숙소/호텔", title: "전 세계 숙소 8% 할인", code: "MYREALHOTEL8", desc: "제휴카드 결제 시 추가 할인", link: "https://www.myrealtrip.com" },
-            { category: "항공권", title: "동남아 항공권 특가 쿠폰", code: "ASIAFLIGHT10", desc: "선착순 즉시 할인", link: "https://www.myrealtrip.com" }
-        ];
-
-        // API 데이터를 호출하여 렌더링하는 함수
-        async function fetchCoupons() {
-            const listContainer = document.getElementById("coupon-list");
-            
+        async function loadData() {
+            const list = document.getElementById("coupon-list");
             try {
-                // 마이리얼트립 파트너스/쿠폰 API 엔드포인트 호출
-                const response = await fetch("https://api.myrealtrip.com/v1/promotions", {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${API_KEY}`,
-                        "Content-Type": "application/json"
-                    }
-                });
-
-                if (!response.ok) throw new Error("API Response Error");
-                const data = await response.json();
+                // GitHub Action이 생성해둔 data.json 읽기
+                const res = await fetch('./data.json');
+                const data = await res.json();
                 
-                // API 데이터 렌더링 (응답 구조에 맞게 매핑)
-                renderCoupons(data.promotions || fallbackCoupons);
-            } catch (error) {
-                console.warn("API 연동 중 오류 발생 또는 CORS 제약으로 기본 데이터를 표출합니다.", error);
-                // API 호출 실패 시 백업용 쿠폰 데이터를 출력하여 사이트가 비어보이지 않게 방어
-                renderCoupons(fallbackCoupons);
+                list.innerHTML = "";
+                const coupons = data.promotions || data;
+
+                if (!coupons || coupons.length === 0) {
+                    list.innerHTML = "<p>현재 진행 중인 쿠폰이 없습니다.</p>";
+                    return;
+                }
+
+                coupons.forEach(item => {
+                    const card = document.createElement("div");
+                    card.className = "card";
+                    card.innerHTML = `
+                        <div class="card-info">
+                            <span class="tag">${item.category || '할인쿠폰'}</span>
+                            <h3>${item.title || item.name}</h3>
+                            <p>${item.desc || '클릭 시 코드 복사 및 이동'}</p>
+                        </div>
+                        <button class="btn-copy" onclick="copyCode('${item.code}', '${item.link || 'https://www.myrealtrip.com'}')">클릭시 자동복사</button>
+                    `;
+                    list.appendChild(card);
+                });
+            } catch (err) {
+                list.innerHTML = "<p>쿠폰 데이터를 불러오는 중 오류가 발생했습니다.</p>";
             }
         }
 
-        // 화면에 쿠폰 카드를 그려주는 함수
-        function renderCoupons(coupons) {
-            const listContainer = document.getElementById("coupon-list");
-            listContainer.innerHTML = ""; // 로딩 문구 제거
-
-            coupons.forEach(item => {
-                const card = document.createElement("div");
-                card.className = "card";
-                card.innerHTML = `
-                    <div class="card-info">
-                        <span class="tag">${item.category || '공통 할인'}</span>
-                        <h3>${item.title}</h3>
-                        <p>${item.desc || '클릭하여 복사 후 결제 시 사용'}</p>
-                    </div>
-                    <button class="btn-copy" onclick="copyAndRedirect('${item.code}', '${item.link || 'https://www.myrealtrip.com'}')">클릭시 자동복사</button>
-                `;
-                listContainer.appendChild(card);
-            });
-        }
-
-        // 복사 및 이동 함수
-        function copyAndRedirect(code, url) {
+        function copyCode(code, url) {
             navigator.clipboard.writeText(code).then(() => {
-                alert(`쿠폰코드 [ ${code} ] 가 복사되었습니다!\n이동하는 페이지에서 결제 시 붙여넣기 해주세요.`);
-                window.open(url, '_blank');
-            }).catch(() => {
+                alert(`쿠폰코드 [ ${code} ] 가 복사되었습니다!`);
                 window.open(url, '_blank');
             });
         }
 
-        // 페이지 로드 시 실행
-        fetchCoupons();
+        loadData();
     </script>
 </body>
 </html>
