@@ -1,0 +1,29 @@
+name: Update Coupons from API
+
+on:
+  schedule:
+    # 매일 00:00 (UTC기준) 마다 자동으로 API 호출
+    - cron: '0 0 * * *'
+  workflow_dispatch: # 버튼 눌러서 즉시 실행도 가능
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Fetch Latest Coupons
+        env:
+          API_KEY: ${{ secrets.MYREALTIP_API_KEY }}
+        run: |
+          # API 호출 후 data.json 파일로 저장
+          curl -H "Authorization: Bearer $API_KEY" https://api.myrealtrip.com/v1/promotions -o data.json || echo "[]" > data.json
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions@github.com"
+          git add data.json
+          git commit -m "Auto update coupon data" || exit 0
+          git push
