@@ -31,20 +31,34 @@
 
     <script>
         async function loadData() {
-            const list = document.getElementById("coupon-list");
-            try {
-                // GitHub Action이 생성해둔 data.json 읽기
-                const res = await fetch('./data.json');
-                const data = await res.json();
-                
-                list.innerHTML = "";
-                const coupons = data.promotions || data;
-
-                if (!coupons || coupons.length === 0) {
-                    list.innerHTML = "<p>현재 진행 중인 쿠폰이 없습니다.</p>";
-                    return;
+            // 하드코딩된 기본 쿠폰 (data.json 실패 시 보여줄 비상용 쿠폰)
+            const defaultCoupons = [
+                { category: "해외 투어/티켓", title: "5,000원 할인쿠폰", code: "260CMKTP5000", desc: "최소 결제금액 조건 확인", link: "https://www.myrealtrip.com" },
+                { category: "숙소/호텔", title: "전 세계 숙소 8% 할인", code: "MYREALHOTEL8", desc: "제휴카드 결제 시 추가 할인", link: "https://www.myrealtrip.com" }
+            ];
+            
+            async function loadData() {
+                const list = document.getElementById("coupon-list");
+                try {
+                    const res = await fetch('./data.json');
+                    if (!res.ok) throw new Error("File not found");
+                    const data = await res.json();
+                    
+                    const coupons = data.promotions || data;
+                    if (!coupons || coupons.length === 0) {
+                        renderList(defaultCoupons);
+                    } else {
+                        renderList(coupons);
+                    }
+                } catch (err) {
+                    // data.json이 없거나 실패하면 기본 쿠폰 목록 출력
+                    renderList(defaultCoupons);
                 }
-
+            }
+            
+            function renderList(coupons) {
+                const list = document.getElementById("coupon-list");
+                list.innerHTML = "";
                 coupons.forEach(item => {
                     const card = document.createElement("div");
                     card.className = "card";
