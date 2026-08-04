@@ -9,6 +9,8 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 50px; }
         .header { background: var(--primary); color: white; text-align: center; padding: 30px 15px; }
+        .header h1 { font-size: 22px; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
         .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
         .section-title { font-size: 18px; font-weight: bold; margin: 25px 0 12px; }
         .card { background: var(--card-bg); border-radius: 12px; padding: 18px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; }
@@ -16,7 +18,7 @@
         .card-info .tag { display: inline-block; background: #eef6ff; color: var(--primary); font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px; }
         .card-info h3 { font-size: 15px; margin-bottom: 4px; }
         .card-info p { font-size: 12px; color: #777; }
-        .btn-copy { background: var(--primary); color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; }
+        .btn-copy { background: var(--primary); color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -26,54 +28,54 @@
     </div>
     <div class="container">
         <div class="section-title">🎫 최신 할인쿠폰</div>
-        <div id="coupon-list">로딩 중...</div>
+        <div id="coupon-list"></div>
     </div>
 
     <script>
+        // 비상용 기본 쿠폰 데이터 (data.json 읽기 실패 시 표출)
+        const fallbackCoupons = [
+            { category: "해외 투어/티켓", title: "5,000원 할인쿠폰", code: "260CMKTP5000", desc: "최소 결제금액 조건 확인", link: "https://www.myrealtrip.com" },
+            { category: "숙소/호텔", title: "전 세계 숙소 8% 할인", code: "MYREALHOTEL8", desc: "제휴카드 결제 시 추가 할인", link: "https://www.myrealtrip.com" },
+            { category: "항공권", title: "동남아 항공권 특가 쿠폰", code: "ASIAFLIGHT10", desc: "선착순 즉시 할인", link: "https://www.myrealtrip.com" }
+        ];
+
+        // 쿠폰 카드를 화면에 그려주는 함수
+        function renderList(coupons) {
+            const list = document.getElementById("coupon-list");
+            list.innerHTML = "";
+            
+            coupons.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "card";
+                card.innerHTML = `
+                    <div class="card-info">
+                        <span class="tag">${item.category || '할인쿠폰'}</span>
+                        <h3>${item.title || item.name}</h3>
+                        <p>${item.desc || '클릭 시 코드 복사 및 이동'}</p>
+                    </div>
+                    <button class="btn-copy" onclick="copyCode('${item.code}', '${item.link || 'https://www.myrealtrip.com'}')">클릭시 자동복사</button>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        // 데이터 불러오기 함수
         async function loadData() {
-            // 하드코딩된 기본 쿠폰 (data.json 실패 시 보여줄 비상용 쿠폰)
-            const defaultCoupons = [
-                { category: "해외 투어/티켓", title: "5,000원 할인쿠폰", code: "260CMKTP5000", desc: "최소 결제금액 조건 확인", link: "https://www.myrealtrip.com" },
-                { category: "숙소/호텔", title: "전 세계 숙소 8% 할인", code: "MYREALHOTEL8", desc: "제휴카드 결제 시 추가 할인", link: "https://www.myrealtrip.com" }
-            ];
-            
-            async function loadData() {
-                const list = document.getElementById("coupon-list");
-                try {
-                    const res = await fetch('./data.json');
-                    if (!res.ok) throw new Error("File not found");
-                    const data = await res.json();
-                    
-                    const coupons = data.promotions || data;
-                    if (!coupons || coupons.length === 0) {
-                        renderList(defaultCoupons);
-                    } else {
-                        renderList(coupons);
-                    }
-                } catch (err) {
-                    // data.json이 없거나 실패하면 기본 쿠폰 목록 출력
-                    renderList(defaultCoupons);
+            try {
+                const res = await fetch('./data.json?v=' + new Date().getTime());
+                if (!res.ok) throw new Error("No data file");
+                
+                const data = await res.json();
+                const coupons = data.promotions || (Array.isArray(data) ? data : []);
+                
+                if (coupons.length > 0) {
+                    renderList(coupons);
+                } else {
+                    renderList(fallbackCoupons);
                 }
-            }
-            
-            function renderList(coupons) {
-                const list = document.getElementById("coupon-list");
-                list.innerHTML = "";
-                coupons.forEach(item => {
-                    const card = document.createElement("div");
-                    card.className = "card";
-                    card.innerHTML = `
-                        <div class="card-info">
-                            <span class="tag">${item.category || '할인쿠폰'}</span>
-                            <h3>${item.title || item.name}</h3>
-                            <p>${item.desc || '클릭 시 코드 복사 및 이동'}</p>
-                        </div>
-                        <button class="btn-copy" onclick="copyCode('${item.code}', '${item.link || 'https://www.myrealtrip.com'}')">클릭시 자동복사</button>
-                    `;
-                    list.appendChild(card);
-                });
             } catch (err) {
-                list.innerHTML = "<p>쿠폰 데이터를 불러오는 중 오류가 발생했습니다.</p>";
+                // data.json이 없거나 실패하면 대기 없이 바로 기본 쿠폰 표출
+                renderList(fallbackCoupons);
             }
         }
 
@@ -81,9 +83,12 @@
             navigator.clipboard.writeText(code).then(() => {
                 alert(`쿠폰코드 [ ${code} ] 가 복사되었습니다!`);
                 window.open(url, '_blank');
+            }).catch(() => {
+                window.open(url, '_blank');
             });
         }
 
+        // 실행
         loadData();
     </script>
 </body>
